@@ -21,7 +21,7 @@ def cleaner(text):
     text = re.sub(r'[ô]','o',text)
     return text
 
-# Foonction obtention du résultat
+# Fonction obtention du résultat
 def get_answer(user_response):
     question = []
     question.append(user_response)
@@ -74,7 +74,7 @@ app = Flask(__name__)
 # Routage
 @app.route('/')
 def question():
-    return render_template('corobot.html')
+    return render_template('corobot.html',question="Vous posez une question...", answer="Je vous répondrai dans la limite de mes compétences !")
 
 @app.route('/', methods=['POST'])
 def answer():
