@@ -2,12 +2,15 @@
 import nltk
 import numpy as np
 import random
-import string # to process standard python strings
+import string
 import re
 from flask import Flask, request, render_template
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from nltk.stem.snowball import FrenchStemmer
 
+# Instance Stemmer
+stemmer = FrenchStemmer()
 
 # Fonction nettoyage texte/input
 def cleaner(text):
@@ -20,6 +23,19 @@ def cleaner(text):
     text = re.sub(r'[ç]','c',text)
     text = re.sub(r'[ô]','o',text)
     return text
+
+# fonction qui transforme une phrase en liste de mots:
+def sentence_to_words(text):
+    return nltk.word_tokenize(text) 
+
+# fonction qui "stemmatize"
+def stem(sentence):
+    stem = ''
+    tokenized = sentence_to_words(sentence.lower())
+    for word in tokenized:
+        stem += ' ' + stemmer.stem(word)
+    print(stem) # Pour débug
+    return stem
 
 # Fonction obtention du résultat
 def get_answer(user_response):
@@ -65,7 +81,7 @@ for phrase in phrases:
     phrases_clean.append(cleaner(phrase))
 
 # Entrainement du modèle
-TfidfVec = TfidfVectorizer(stop_words = stop_words)
+TfidfVec = TfidfVectorizer(tokenizer=stem, stop_words = stop_words)
 tf_idf_chat = TfidfVec.fit(phrases_clean)
 
 # On déclare l'app
@@ -81,7 +97,7 @@ def answer():
     user_question = request.form['question']
     question = f"Vous: {user_question}"
 
-    answer = get_answer(cleaner(user_question))
+    answer = get_answer(stem(cleaner(user_question)))
 
     return render_template('corobot.html', question=question, answer=answer)
 
