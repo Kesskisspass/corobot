@@ -1,4 +1,7 @@
-# Imports
+##########
+# IMPORTS
+##########
+
 import nltk
 import numpy as np
 import random
@@ -9,8 +12,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.stem.snowball import FrenchStemmer
 
-# Instance Stemmer
-stemmer = FrenchStemmer()
+##########
+# FONCTIONS
+##########
 
 # Fonction nettoyage texte/input
 def cleaner(text):
@@ -22,6 +26,7 @@ def cleaner(text):
     text = re.sub(r"(chez soi|chez moi|chez vous)","à domicile",text)
     text = re.sub(r"(docteurs?|médecins?|professionn?el de santé)","médecin",text)
     text = re.sub("n.c.a.","NCA",text)
+
     # 2. accents
     text = re.sub(r'[éèê]','e',text)
     text = re.sub(r'[ù]','u',text)
@@ -35,6 +40,8 @@ def cleaner(text):
 
 # fonction qui "stemmatise"
 def stem(sentence):
+    # Instance Stemmer
+    stemmer = FrenchStemmer()
     stem = ''
     for word in nltk.word_tokenize(sentence) :
         stem += ' ' + stemmer.stem(word)
@@ -59,6 +66,10 @@ def get_answer(user_question):
         	return f"COROBOT : {phrases[idx]} (Taux de confiance: {round(vals[0][idx]*100, 2)}%)"
     else:
         return "COROBOT: Au revoir !"
+
+##########
+# APP
+##########
 
 # On stocke le texte dans une variable
 f=open('./static/infos_corona.txt','r',errors = 'ignore',encoding="utf-8-sig")
@@ -106,6 +117,6 @@ def answer():
  
     return render_template('corobot.html', question=question, answer=answer)
 
-# On lance l'app
+# Lancement app
 if __name__ == "__main__":
     app.run()
