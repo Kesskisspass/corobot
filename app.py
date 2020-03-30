@@ -19,6 +19,7 @@ def cleaner(text):
     text = re.sub(r"(morts?)|(victimes?)","décès",text)
     text = re.sub(r"(contraventions?|amendes?)","amende",text)
     text = re.sub(r"(chez soi|chez moi|chez vous)","à domicile",text)
+    text = re.sub(r"(docteurs?|médecins?|professionn?el de santé)","médecin",text)
     text = re.sub("n.c.a.","NCA",text)
     text = re.sub(r'[éèê]','e',text)
     text = re.sub(r'[ù]','u',text)
