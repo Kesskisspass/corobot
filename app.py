@@ -26,9 +26,11 @@ def cleaner(text):
     text = re.sub(r'[àâ]','a',text)
     text = re.sub(r'[ç]','c',text)
     text = re.sub(r'[ô]','o',text)
+    # Stemmatisation dans la fonction clean
+    text = stem(text)
     return text
 
-# fonction qui "stemmatize"
+# fonction qui "stemmatise"
 def stem(sentence):
     stem = ''
     for word in nltk.word_tokenize(sentence) :
@@ -81,7 +83,6 @@ for phrase in phrases:
 
 # Entrainement du modèle
 TfidfVec = TfidfVectorizer(stop_words = stop_words)
-#TfidfVec = TfidfVectorizer(tokenizer=stem,stop_words = stop_words) # Avec stem
 tf_idf_chat = TfidfVec.fit(phrases_clean)
 
 # On déclare l'app
@@ -97,8 +98,8 @@ def answer():
     user_question = request.form['question']
     question = f"Vous: {user_question}"
 
-    answer = get_answer(cleaner(user_question))
-    #answer = get_answer(stem(cleaner(user_question))) # Si j'active stem
+    #answer = get_answer(cleaner(user_question))
+    answer = get_answer(stem(cleaner(user_question))) # Si j'active stem
  
     return render_template('corobot.html', question=question, answer=answer)
 
