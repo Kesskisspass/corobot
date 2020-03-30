@@ -18,6 +18,7 @@ def cleaner(text):
     text = re.sub("coronavirus coronavirus","coronavirus",text)
     text = re.sub(r"(morts?)|(victimes?)","décès",text)
     text = re.sub(r"(contraventions?|amendes?)","amende",text)
+    text = re.sub(r"(chez soi|chez moi|chez vous)","à domicile",text)
     text = re.sub("n.c.a.","NCA",text)
     text = re.sub(r'[éèê]','e',text)
     text = re.sub(r'[ù]','u',text)
@@ -93,7 +94,7 @@ def question():
 @app.route('/', methods=['POST'])
 def answer():
     user_question = request.form['question']
-    question = f"Vous: {cleaner(user_question)}"
+    question = f"Vous: {user_question}"
 
     answer = get_answer(cleaner(user_question))
     #answer = get_answer(stem(cleaner(user_question))) # Si j'active stem
@@ -102,4 +103,4 @@ def answer():
 
 # On lance l'app
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
