@@ -26,15 +26,10 @@ def cleaner(text):
     text = re.sub(r'[ô]','o',text)
     return text
 
-# fonction qui transforme une phrase en liste de mots:
-def sentence_to_words(text):
-    return nltk.word_tokenize(text) 
-
 # fonction qui "stemmatize"
 def stem(sentence):
     stem = ''
-    tokenized = sentence_to_words(sentence.lower())
-    for word in tokenized:
+    for word in nltk.word_tokenize(sentence) :
         stem += ' ' + stemmer.stem(word)
     #print(stem) # Pour débug
     return stem
@@ -52,7 +47,7 @@ def get_answer(user_question):
     req_tfidf = flat[-1]
     if(user_question!='au revoir'):
     	if (req_tfidf == 0):
-    		return "COROBOT: Je n'ai pas bien compris votre question"
+    		return "COROBOT: Je n'ai pas bien compris votre question."
     	else:
         	return f"COROBOT : {phrases[idx]} (Taux de confiance: {round(vals[0][idx]*100, 2)}%)"
     else:
@@ -84,6 +79,7 @@ for phrase in phrases:
 
 # Entrainement du modèle
 TfidfVec = TfidfVectorizer(stop_words = stop_words)
+#TfidfVec = TfidfVectorizer(tokenizer=stem,stop_words = stop_words) # Avec stem
 tf_idf_chat = TfidfVec.fit(phrases_clean)
 
 # On déclare l'app
@@ -100,7 +96,8 @@ def answer():
     question = f"Vous: {cleaner(user_question)}"
 
     answer = get_answer(cleaner(user_question))
-
+    #answer = get_answer(stem(cleaner(user_question))) # Si j'active stem
+ 
     return render_template('corobot.html', question=question, answer=answer)
 
 # On lance l'app
