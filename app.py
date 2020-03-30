@@ -16,6 +16,8 @@ stemmer = FrenchStemmer()
 def cleaner(text):
     text = re.sub(r"(covid-19)|(covid 19)","coronavirus",text)
     text = re.sub("coronavirus coronavirus","coronavirus",text)
+    text = re.sub(r"(morts?)|(victimes?)","décès",text)
+    text = re.sub(r"(contraventions?|amendes?)","amende",text)
     text = re.sub("n.c.a.","NCA",text)
     text = re.sub(r'[éèê]','e',text)
     text = re.sub(r'[ù]','u',text)
@@ -34,13 +36,13 @@ def stem(sentence):
     tokenized = sentence_to_words(sentence.lower())
     for word in tokenized:
         stem += ' ' + stemmer.stem(word)
-    print(stem) # Pour débug
+    #print(stem) # Pour débug
     return stem
 
 # Fonction obtention du résultat
-def get_answer(user_response):
+def get_answer(user_question):
     question = []
-    question.append(user_response)
+    question.append(user_question)
     tfidf_a = tf_idf_chat.transform(phrases_clean)
     tfidf_q = tf_idf_chat.transform(question)
     vals = cosine_similarity(tfidf_q, tfidf_a)  
@@ -48,11 +50,11 @@ def get_answer(user_response):
     flat = vals.flatten()
     flat.sort()
     req_tfidf = flat[-1]
-    if(user_response!='au revoir'):
+    if(user_question!='au revoir'):
     	if (req_tfidf == 0):
     		return "COROBOT: Je n'ai pas bien compris votre question"
     	else:
-        	return f"COROBOT : {phrases[idx]}"
+        	return f"COROBOT : {phrases[idx]} (Taux de confiance: {round(vals[0][idx]*100, 2)}%)"
     else:
         return "COROBOT: Au revoir !"
 
@@ -81,7 +83,7 @@ for phrase in phrases:
     phrases_clean.append(cleaner(phrase))
 
 # Entrainement du modèle
-TfidfVec = TfidfVectorizer(tokenizer=stem, stop_words = stop_words)
+TfidfVec = TfidfVectorizer(stop_words = stop_words)
 tf_idf_chat = TfidfVec.fit(phrases_clean)
 
 # On déclare l'app
@@ -95,9 +97,9 @@ def question():
 @app.route('/', methods=['POST'])
 def answer():
     user_question = request.form['question']
-    question = f"Vous: {user_question}"
+    question = f"Vous: {cleaner(user_question)}"
 
-    answer = get_answer(stem(cleaner(user_question)))
+    answer = get_answer(cleaner(user_question))
 
     return render_template('corobot.html', question=question, answer=answer)
 
