@@ -14,6 +14,7 @@ stemmer = FrenchStemmer()
 
 # Fonction nettoyage texte/input
 def cleaner(text):
+    # 1. synonymes
     text = re.sub(r"(covid-19)|(covid 19)","coronavirus",text)
     text = re.sub("coronavirus coronavirus","coronavirus",text)
     text = re.sub(r"(morts?)|(victimes?)","décès",text)
@@ -21,12 +22,14 @@ def cleaner(text):
     text = re.sub(r"(chez soi|chez moi|chez vous)","à domicile",text)
     text = re.sub(r"(docteurs?|médecins?|professionn?el de santé)","médecin",text)
     text = re.sub("n.c.a.","NCA",text)
+    # 2. accents
     text = re.sub(r'[éèê]','e',text)
     text = re.sub(r'[ù]','u',text)
     text = re.sub(r'[àâ]','a',text)
     text = re.sub(r'[ç]','c',text)
     text = re.sub(r'[ô]','o',text)
-    # Stemmatisation dans la fonction clean
+
+    # 3. Stemmatisation
     text = stem(text)
     return text
 
